@@ -2,6 +2,7 @@
 #include <lvgl.h>
 
 static void on_button_pressed(lv_event_t *e);
+static void set_img_rotation(void * obj, int32_t v);
 
 static lv_obj_t *root_page = NULL;
 static lv_obj_t *img;
@@ -44,6 +45,16 @@ void zds_ui_show(lv_obj_t *root)
     lv_obj_set_style_bg_img_src(float_btn, LV_SYMBOL_REFRESH, 0);
     lv_obj_set_style_text_font(float_btn, lv_theme_get_font_large(float_btn), 0);
 
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, img);
+    lv_anim_set_exec_cb(&a, set_img_rotation);
+    lv_anim_set_time(&a, 2000);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&a, 0);
+    lv_anim_set_values(&a, 0, 3600);
+    lv_anim_start(&a);
+
     lv_group_focus_obj(float_btn);
 }
 
@@ -63,4 +74,9 @@ static void on_button_pressed(lv_event_t *e)
 {
     current_rotation = (current_rotation + 100) % 3600;
     lv_img_set_angle(img, current_rotation);
+}
+
+static void set_img_rotation(void * obj, int32_t v)
+{
+    lv_img_set_angle(obj, v);
 }
