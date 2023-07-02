@@ -8,7 +8,6 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/logging/log.h>
 #include "lvgl.h"
-#include <zsw_cpu_freq.h>
 
 LOG_MODULE_REGISTER(display_control, LOG_LEVEL_WRN);
 
@@ -117,12 +116,8 @@ void display_control_set_brightness(uint8_t percent)
 
 static void lvgl_render(struct k_work *item)
 {
-    // Running at max CPU freq consumes more power, but rendering we
-    // want to do as fast as possible. Also to use 32MHz SPI, CPU has
-    // to be running at 128MHz. Meaning this improves both rendering times
-    // and the SPI transmit time.
-    zsw_cpu_set_freq(ZSW_CPU_FREQ_FAST, true);
+    //printk("lvgl_render\n");
     const int64_t next_update_in_ms = lv_task_handler();
-    zsw_cpu_set_freq(ZSW_CPU_FREQ_DEFAULT, false);
+    //printk("lvgl_render done\n");
     k_work_schedule(&lvgl_work, K_MSEC(next_update_in_ms));
 }

@@ -96,6 +96,8 @@ ZBUS_LISTENER_DEFINE(main_ble_comm_lis, zbus_ble_comm_data_callback);
 static void run_init_work(struct k_work *item)
 {
     lv_indev_t *touch_indev;
+
+    zsw_cpu_set_freq(ZSW_CPU_FREQ_FAST, true);
     load_retention_ram();
     heart_rate_sensor_init();
     notifications_page_init(on_notification_page_close, on_notification_page_notification_close);
@@ -146,7 +148,7 @@ void run_wdt_work(struct k_work *item)
     k_work_schedule(&wdt_work, K_MSEC(TASK_WDT_FEED_INTERVAL_MS));
 }
 
-void main(void)
+int main(void)
 {
 #ifdef CONFIG_TASK_WDT
     const struct device *hw_wdt_dev = DEVICE_DT_GET(DT_ALIAS(watchdog0));

@@ -25,6 +25,7 @@
 #include <zephyr/logging/log.h>
 #include <events/activity_event.h>
 #include <ram_retention_storage.h>
+#include <zsw_cpu_freq.h>
 
 LOG_MODULE_REGISTER(zsw_power_manager, LOG_LEVEL_DBG);
 
@@ -84,6 +85,7 @@ static void enter_inactive(void)
     retained.wakeup_time += k_uptime_get_32() - last_wakeup_time;
     retained_update();
     display_control_power_on(false);
+    zsw_cpu_set_freq(ZSW_CPU_FREQ_DEFAULT, false);
 
     struct activity_state_event evt = {
         .state = ZSW_ACTIVITY_STATE_INACTIVE,
@@ -96,6 +98,12 @@ static void enter_active(void)
     LOG_DBG("Enter active");
     is_active = true;
     last_wakeup_time = k_uptime_get_32();
+
+    // Running at max CPU freq consumes more power, but rendering we
+    // want to do as fast as possible. Also to use 32MHz SPI, CPU has
+    // to be running at 128MHz. Meaning this improves both rendering times
+    // and the SPI transmit time.
+    zsw_cpu_set_freq(ZSW_CPU_FREQ_FAST, true);
     display_control_power_on(true);
 
     struct activity_state_event evt = {
@@ -136,7 +144,7 @@ static void zbus_accel_data_callback(const struct zbus_channel *chan)
     }
 }
 
-static int zsw_power_manager_init(const struct device *arg)
+static int zsw_power_manager_init(void)
 {
     last_wakeup_time = k_uptime_get_32();
     k_work_schedule(&idle_work, K_SECONDS(IDLE_TIMEOUT_SECONDS));
