@@ -7,4 +7,4 @@ void compass_ui_show(lv_obj_t *root);
 
 void compass_ui_remove(void);
 
-void compass_ui_set_heading(double heading);
+void compass_ui_set_heading(int heading);

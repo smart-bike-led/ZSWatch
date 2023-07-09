@@ -40,10 +40,11 @@ static void compass_app_stop(void)
     compass_ui_remove();
     magnetometer_set_enable(false);
 }
-
+static int c = 0;
 static void timer_callback(lv_timer_t *timer)
 {
     double heading = magnetometer_get_heading();
+    //c = (c + 1) % 365;
     compass_ui_set_heading(heading);
 }
 

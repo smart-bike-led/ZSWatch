@@ -92,6 +92,10 @@ static void lis2mdl_trigger_handler(const struct device *dev,
                                    sensor_value_to_double(&magn[1]),
                                    sensor_value_to_double(&magn[2]));
 
+    LOG_ERR("%f, %f, %f",sensor_value_to_double(&magn[0]),
+                                   sensor_value_to_double(&magn[1]),
+                                   sensor_value_to_double(&magn[2]));
+
     LOG_DBG("Rotation: %f", last_heading);
 }
 
@@ -99,9 +103,8 @@ static void lis2mdl_trigger_handler(const struct device *dev,
 // Note this assumes watch is flat to eath, TODO use accelerometer to compensate when tilted.
 static double xyz_to_rotation(double x, double y, double z)
 {
-    double heading = atan2(y, x) * 180 / M_PI;
-    if (heading < 0) {
-        heading = 360 + heading;
-    }
+    double heading = (atan2(y,x) - 0.1) * 180 / M_PI;
+    if (heading < 0) heading += 360;
+    if (heading > 360) heading -= 360;
     return heading;
 }
