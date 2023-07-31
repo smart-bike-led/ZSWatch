@@ -1,0 +1,18 @@
+name: Kicad DRC check
+on: push
+env:
+  PCB_PATH: ZSWatch-kicad-v2/ZSWatch.kicad_pcb
+  SCH_PATH: ZSWatch-kicad-v2/ZSWatch.kicad_sch
+
+jobs:
+  drc_check:
+    runs-on: ubuntu-22.04
+    container: 
+      image: ghcr.io/inti-cmnb/kicad7_auto:1.6.3
+      options: --user root
+    steps:
+      - name: Checkout latest
+        uses: actions/checkout@v3
+      - name: Run diff
+        run: |
+          pcbnew_do run_drc $PCB_PATH drc_out/
